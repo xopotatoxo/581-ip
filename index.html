@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="https://glitch.com/favicon.ico" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="libs/polyfill.js"></script>
+    <script src="src/svd.js"></script>
+    <script src="/src/posit1.js"></script>
+    <script src="/src/cv.js"></script>
+    <script src="src/aruco.js" defer></script>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+
+    <script>
+        // Marker IDs for the two markers we are working with
+        const frontID = 0;
+        const backID = 1;
+
+        // Setup some colours for the markers
+        const canSeeColour = "green";
+        const cannotSeeColour = "blue";
+      
+        var video, canvas, context, imageData, detector, posit;
+      
+        var markerSize = 150.0; // The real-life size in millimeters of your marker
+      
+        function onLoad() {
+          video = document.getElementById("video");
+          canvas = document.getElementById("canvas");
+          context = canvas.getContext("2d");
+      
+          canvas.width = parseInt(canvas.style.width);
+          canvas.height = parseInt(canvas.style.height);
+      
+          navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              facingMode: 'environment' // Try to get the back-facing camera
+            }
+          })
+          .then(stream => video.srcObject = stream)
+          .catch(console.error);
+      
+          detector = new AR.Detector();
+          posit = new POS.Posit(markerSize, canvas.width);
+      
+          requestAnimationFrame(tick);
+        }
+      
+        function tick() {
+          requestAnimationFrame(tick);
+      
+          if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            snapshot();
+      
+            var markers = detector.detect(imageData);
+            
+            drawId(markers);
+      
+            updateWhatSidesWeCanSee(markers);
+            updateDistanceToMarker(markers);
+          }
+        }
+      
+        function snapshot() {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        }
+      
+        function updateWhatSidesWeCanSee(markers) {
+        // Set the button colours to default
+        updateButtonColour("proxemicButtonFront", cannotSeeColour);
+        updateButtonColour("proxemicButtonBack", cannotSeeColour);
+
+        var i;
+        for (i = 0; i < markers.length; i++) {
+            switch (markers[i].id) {
+            case frontID:
+                updateButtonColour("proxemicButtonFront", canSeeColour);
+                // If front marker is visible (turned green), move door
+                updateDoors(canSeeColour); // Door will slide when turned green
+                break;
+            case backID:
+                updateButtonColour("proxemicButtonBack", canSeeColour);
+                // If back marker is visible (turned green), move door2
+                updateDoorsForBack(canSeeColour); // Move door2 when back marker is green
+                break;
+            default:
+                break;
+            }
+        }
+        }
+
+        function updateDistanceToMarker(markers) {
+        let targetMarker = null;
+
+        // Find the target marker (e.g., marker with ID `frontID`)
+        markers.forEach(marker => {
+            if (marker.id === frontID) {
+                targetMarker = marker;
+            }
+        });
+
+        // If the target marker is found, calculate the distance
+        if (targetMarker) {
+            const pose = posit.pose(targetMarker.corners);
+            if (pose) {
+                const zDistance = pose.bestTranslation[2]; // Z-axis distance in millimeters
+
+                // Update the UI with the distance value
+                const distanceElement = document.getElementById("distanceDisplay");
+                distanceElement.textContent = `Distance to Marker: ${zDistance.toFixed(2)} mm`;
+
+                // Close doors if the distance exceeds 700 mm
+                if (zDistance > 700) {
+                    closeDoors();
+                }
+            }
+        }
+    }
+
+        function closeDoors() {
+            const door1 = document.getElementById("door1");
+            const door2 = document.getElementById("door2");
+
+            // Reset door positions to their original closed state
+            door1.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door1.style.transform = "translateX(0)"; // Reset door1 to its original position
+            door2.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door2.style.transform = "translateX(0)"; // Reset door2 to its original position
+        }
+
+      
+        // Function to get the center of a marker
+        function getMarkerCenter(marker) {
+          const x = (marker.corners[0].x + marker.corners[2].x) / 2;
+          const y = (marker.corners[0].y + marker.corners[2].y) / 2;
+          return { x, y };
+        }
+      
+        // Function to calculate the Euclidean distance between two points
+        function calculateDistance(center1, center2) {
+          const dx = center1.x - center2.x;
+          const dy = center1.y - center2.y;
+          return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function updateDoors(colour) {
+          const door1 = document.getElementById("door1");
+          const door2 = document.getElementById("door2");
+      
+          // Transition logic based on the marker's colour
+          if (colour === canSeeColour) {
+            // If front marker is green, move door2 to the left (behind door1)
+            door2.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door2.style.transform = "translateX(-301px)"; // Move door2 behind door1
+            door1.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door1.style.transform = "translateX(0)"; // Door1 stays in place
+          } 
+          
+        }
+
+        function updateDoorsForBack(colour) {
+        const door1 = document.getElementById("door1");
+        const door2 = document.getElementById("door2");
+
+        if (colour === canSeeColour) {
+            // If back marker is green, move door2 in front of door1
+            // If front marker is green, move door2 to the left (behind door1)
+            door1.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door1.style.transform = "translateX(301px)"; // Move door2 behind door1
+            door2.style.transition = "transform 1s ease-in-out"; // Smooth transition
+            door2.style.transform = "translateX(0)"; // Door1 stays in place
+        }
+        }
+
+      
+        function updateButtonColour(buttonName, colourName) {
+          const button = document.getElementById(buttonName);
+          if (button != null) {
+            button.style.backgroundColor = colourName;
+          }
+        }
+      
+        function drawId(markers) {
+          var corners, corner, x, y, i, j;
+      
+          context.strokeStyle = "green";
+          context.lineWidth = 1;
+      
+          for (i = 0; i < markers.length; ++i) {
+            corners = markers[i].corners;
+      
+            x = Infinity;
+            y = Infinity;
+      
+            for (j = 0; j < corners.length; ++j) {
+              corner = corners[j];
+      
+              x = Math.min(x, corner.x);
+              y = Math.min(y, corner.y);
+            }
+      
+            context.strokeText(markers[i].id, x, y - 10); // Position text slightly above the marker
+          }
+        }
+      
+        window.onload = onLoad;
+    </script>
+  </head>
+  <body>
+    <div id="div"></div><br>
+    <video id="video" height="20vh" autoplay></video>
+    <canvas hidden id="canvas" style="width: 640px; height: 480px"></canvas>
+
+    <div id="doorContainer">
+        <!-- Background Image -->
+        <img id="closetBackground" src="closet.png" width="602" height="420" 
+             style="position: absolute; z-index: 0;" 
+             alt="Closet Background" />
+    
+        <!-- Doors -->
+        <img id="door1" src="Door1.png" width="301" height="420" 
+             style="position: relative; z-index: 1;" alt="Door 1" />
+        <img id="door2" src="Door2.png" width="301" height="420" 
+             style="position: relative; z-index: 1;" alt="Door 2" />
+    </div>
+    
+
+    <div class="rectangle" id="viewerUI">
+      <div id="textInfo">textInfo</div>
+      <button style="color: white" id="proxemicButtonFront">Front</button>
+      <button style="color: white" id="proxemicButtonBack">Back</button>
+    </div>
+    <div id="distanceDisplay" style="color: black; margin-top: 10px;">Distance: 0 mm</div>
+  </body>
+  <div style="margin: 15px">
+    <strong>Powered by
+      <a href="https://damianofalcioni.github.io/js-aruco2/">js-aruco2</a>
+    </strong>
+  </div>
+</html>

@@ -1,0 +1,109 @@
+/* General Resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+    font-family: "HK Grotesk", Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  
+  /* Root Variables for Theming */
+  :root {
+    --color-bg: #69F7BE;
+    --color-text-main: #000000;
+    --color-text-header: #2800FF;
+    --color-primary: #FFFF00;
+    --wrapper-height: 87vh;
+  }
+  
+  /* Main Door Container */
+    #doorContainer {
+        position: relative;
+        display: flex;
+        width: 602px; /* Combined width of both doors and background */
+        height: 420px; /* Height matching the background and doors */
+        justify-content: space-between; /* Ensures doors are side by side */
+        align-items: center; /* Centers the doors vertically */
+        overflow: hidden;
+    }
+
+  
+    #closetBackground {
+        position: absolute; /* Layer it behind the doors */
+        top: 0;
+        left: 0;
+        width: 602px;      /* Same combined width as the doors */
+        height: 420px;     /* Match the height of the doors */
+        z-index: 0;        /* Place it behind other elements */
+    }
+    
+    #door1 {
+        position: relative; /* Default position so it stays next to door2 */
+        z-index: 0;         /* In front of closetBackground */
+    }
+    
+    #door2 {
+        position: relative; /* Ensure it stays adjacent to door1 */
+        z-index: 0;         /* In front of closetBackground */
+    }
+    
+
+  
+  /* Utility Styles */
+  .rectangle {
+    border: 2px solid black;
+    padding: 10px;
+    width: 300px;
+    margin: 20px;
+    border-radius: 5px;
+  }
+  
+  /* Typography */
+  h2, .title {
+    color: var(--color-text-header);
+    font-size: 2rem;
+    text-align: center;
+    margin: 1rem 0;
+  }
+  
+  button, input {
+    font-family: inherit;
+    font-size: 1rem;
+    background: #FFFFFF;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: 300ms ease-in-out;
+  }
+  
+  button:hover, input:hover {
+    background-color: var(--color-primary);
+  }
+  
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+    background: #fff;
+    border-top: 2px solid #ddd;
+  }
+  
+  .footer a {
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--color-text-main);
+  }
+  
+  .footer a:hover {
+    color: var(--color-primary);
+  }
+  
