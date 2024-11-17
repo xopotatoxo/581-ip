@@ -1,109 +1,110 @@
-/* General Resets */
-* {
+html, body {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html, body {
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Prevent scrolling */
-    font-family: "HK Grotesk", Arial, sans-serif;
-    background-color: #f0f0f0;
-  }
-  
-  /* Root Variables for Theming */
-  :root {
-    --color-bg: #69F7BE;
-    --color-text-main: #000000;
-    --color-text-header: #2800FF;
-    --color-primary: #FFFF00;
-    --wrapper-height: 87vh;
-  }
-  
-  /* Main Door Container */
-    #doorContainer {
-        position: relative;
-        display: flex;
-        width: 602px; /* Combined width of both doors and background */
-        height: 420px; /* Height matching the background and doors */
-        justify-content: space-between; /* Ensures doors are side by side */
-        align-items: center; /* Centers the doors vertically */
-        overflow: hidden;
-    }
-
-  
-    #closetBackground {
-        position: absolute; /* Layer it behind the doors */
-        top: 0;
-        left: 0;
-        width: 602px;      /* Same combined width as the doors */
-        height: 420px;     /* Match the height of the doors */
-        z-index: 0;        /* Place it behind other elements */
-    }
-    
-    #door1 {
-        position: relative; /* Default position so it stays next to door2 */
-        z-index: 0;         /* In front of closetBackground */
-    }
-    
-    #door2 {
-        position: relative; /* Ensure it stays adjacent to door1 */
-        z-index: 0;         /* In front of closetBackground */
-    }
-    
-
-  
-  /* Utility Styles */
-  .rectangle {
-    border: 2px solid black;
-    padding: 10px;
-    width: 300px;
-    margin: 20px;
-    border-radius: 5px;
-  }
-  
-  /* Typography */
-  h2, .title {
-    color: var(--color-text-header);
-    font-size: 2rem;
-    text-align: center;
-    margin: 1rem 0;
-  }
-  
-  button, input {
-    font-family: inherit;
-    font-size: 1rem;
-    background: #FFFFFF;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: 300ms ease-in-out;
-  }
-  
-  button:hover, input:hover {
-    background-color: var(--color-primary);
-  }
-  
-  .footer {
+    background-image: url("closet.jpeg"); /* Replace with your image path */
+    background-size: cover; /* Maintain aspect ratio and cover the whole viewport */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent tiling */
+    overflow: hidden; /* Avoid scrolling */
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    padding: 1rem;
-    background: #fff;
-    border-top: 2px solid #ddd;
+    font-family: Arial, sans-serif; /* Set a readable default font */
+}
+
+#mainContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Make the container fill the width */
+    max-width: 800px; /* Limit the width on larger screens */
+    padding: 20px; /* Add some padding for better spacing */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+#doorContainer {
+    position: relative;
+    display: flex;
+    width: 730px; /* Combined width of the doors and background */
+    height: 540px; /* Match the image height */
+    justify-content: space-between; /* Space doors evenly */
+    align-items: center;
+    margin-bottom: 20px; /* Add spacing below the doors */
+}
+
+#closetBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; /* Automatically adjust width */
+    height: 100%; /* Automatically adjust height */
+    z-index: 0; /* Layer behind doors */
+}
+
+#video {
+    margin-bottom: 20px;
+    max-width: 90%; /* Make the video responsive */
+    border: 2px solid #ccc; /* Add a subtle border for visibility */
+    border-radius: 5px; /* Rounded corners for aesthetic */
+}
+
+#viewerUI {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center buttons horizontally */
+    gap: 10px; /* Add consistent spacing between buttons */
+}
+
+#viewerUI button {
+    padding: 10px 20px;
+    font-size: 16px; /* Improve readability */
+    background-color: #f0f0f0; /* Neutral button background */
+    border: 2px solid #ccc; /* Subtle border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+#viewerUI button:hover {
+    background-color: #ddd; /* Slightly darker on hover */
+}
+
+#distanceDisplay {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333; /* Slightly darker for better readability */
+    font-weight: bold; /* Emphasize the text */
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555; /* Subtle color for footer text */
+}
+
+.footer a {
+    /*color: #007bff; /* Link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.footer a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+.distanceDisplay {
+    font-size: 14px;
+    color: gray;
+    margin-top: 4px;
   }
   
-  .footer a {
-    font-size: 1rem;
-    text-decoration: none;
-    color: var(--color-text-main);
-  }
-  
-  .footer a:hover {
-    color: var(--color-primary);
+
+  .fade {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
   }
   
